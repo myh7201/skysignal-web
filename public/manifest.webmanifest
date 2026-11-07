@@ -1,0 +1,1 @@
+{"name":"晴訊 SkySignal","short_name":"晴訊","description":"天氣在眼前，提醒在身邊","lang":"zh-Hant","start_url":"./","scope":"./","display":"standalone","background_color":"#edf3f5","theme_color":"#254e68","icons":[{"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"}]}

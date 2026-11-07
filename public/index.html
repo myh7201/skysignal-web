@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#254e68">
+<meta name="description" content="晴訊網頁版：即時天氣、逐小時與十日預報、五個全球模型及大型互動氣象地圖。">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://tile.openstreetmap.org https://www.hko.gov.hk; connect-src 'self' https://api.open-meteo.com https://geocoding-api.open-meteo.com https://data.weather.gov.hk https://api.weather.gov; object-src 'none'; base-uri 'self'; form-action 'self'; worker-src 'self'">
+<title>晴訊 SkySignal · 天氣在眼前</title>
+<link rel="icon" type="image/svg+xml" href="./icon.svg">
+<link rel="apple-touch-icon" href="./icon.svg">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="./vendor/leaflet.css">
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body class="app-atmosphere" data-route="home">
+<a class="skip-link" href="#main">跳至內容</a>
+<div id="app">
+<aside class="sidebar"><a class="brand" href="#home" aria-label="晴訊首頁"><span class="brand-mark" aria-hidden="true">☀</span><span>晴訊<small>SKYSIGNAL</small></span></a><nav id="nav" aria-label="主要導覽"></nav><div class="sidebar-foot">天氣在眼前<br>提醒在身邊<span>WEB · 0.50</span></div></aside>
+<div class="page-shell"><header class="topbar"><div><span class="eyebrow" id="page-kicker">你的日常天氣</span><h1 id="page-title">現在天氣</h1></div><div class="header-actions"><button class="location-button" id="change-place" aria-haspopup="dialog"><span aria-hidden="true">⌖</span><span id="place-name">香港</span><span aria-hidden="true">⌄</span></button><button class="icon-button" id="refresh" aria-label="更新天氣資料"></button></div></header>
+<main id="main" tabindex="-1" aria-label="天氣內容"><div class="loading-initial" role="status">正在打開晴訊…</div></main>
+</div>
+</div>
+<dialog id="place-dialog" aria-labelledby="place-title"><div class="dialog-head"><div><span class="eyebrow">世界的每個角落</span><h2 id="place-title">想看看哪裡的天氣？</h2></div><button type="button" class="icon-button" data-close="place-dialog" aria-label="關閉地點搜尋">×</button></div><form id="search-form"><label class="sr-only" for="place-query">搜尋城市或地點</label><div class="search-row"><input id="place-query" type="search" placeholder="搜尋城市，例如札幌、台北、倫敦" autocomplete="off" maxlength="100"><button class="primary-button" type="submit">搜尋</button></div></form><button id="geolocate" class="geo-button">⌖ 使用目前位置</button><div id="search-status" class="muted" role="status"></div><div id="search-results"></div><section class="saved-section"><h3>收藏地點</h3><div id="saved-places"></div></section></dialog>
+<dialog id="info-dialog" aria-labelledby="info-title"><div class="dialog-head"><h2 id="info-title">資料來源</h2><button class="icon-button" data-close="info-dialog" aria-label="關閉詳情">×</button></div><div id="info-content"></div></dialog>
+<div id="toast" role="status" aria-live="polite" hidden></div>
+<script src="./vendor/leaflet.js"></script><script src="./map/model-grid.js"></script><script src="./map/model-map.js"></script><script type="module" src="./app.mjs"></script>
+</body>
+</html>
