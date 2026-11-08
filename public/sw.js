@@ -1,4 +1,4 @@
-const CACHE='skysignal-shell-0.50.1';
+const CACHE='skysignal-shell-0.50.2';
 const ASSETS=['./','./index.html','./styles.css','./app.mjs','./core.mjs','./icon.svg','./manifest.webmanifest','./vendor/leaflet.js','./vendor/leaflet.css','./map/model-grid.js','./map/model-map.js'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('skysignal-shell-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));

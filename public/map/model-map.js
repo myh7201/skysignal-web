@@ -40,7 +40,7 @@
   const map=L.map(stage,{zoomControl:false,minZoom:3,maxZoom:15,zoomAnimation:false,fadeAnimation:false,markerZoomAnimation:false,inertia:false});
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors · Weather: <a href="https://open-meteo.com/">Open-Meteo</a> (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>)',maxZoom:18}).addTo(map);
   const samePlace=memory.place===c.place.id&&Math.abs((memory.lat||0)-c.place.lat)<.02&&Math.abs(G.wrap((memory.lon||0)-c.place.lon))<.02;
-  map.setView(samePlace&&memory.center?memory.center:[c.place.lat,c.place.lon],samePlace&&memory.zoom?memory.zoom:7);
+  map.setView(samePlace&&memory.center?memory.center:[c.place.lat,c.place.lon],samePlace&&memory.zoom?memory.zoom:10);
   const raster=make('canvas','model-field-canvas'),stream=make('canvas','model-flow-canvas');raster.setAttribute('aria-label','區域模型氣象預報');stream.setAttribute('aria-hidden','true');map.getPane('overlayPane').append(raster,stream);
   const ctx=raster.getContext('2d'),flowCtx=stream.getContext('2d'),offscreen=make('canvas'),offCtx=offscreen.getContext('2d');
   if(!ctx||!flowCtx||!offCtx){status.textContent='手機暫未支援模型圖層繪製';return {map,dispose(){},resize(){},refresh(){},resetView(){}};}
@@ -137,7 +137,7 @@
   slider.oninput=()=>{pause();chooseTime(Number(slider.value));};
   map.on('move',()=>{if(paintFrame!==null)return;paintFrame=requestAnimationFrame(()=>{paintFrame=null;draw();});});
   map.on('moveend',()=>{const center=map.getCenter();memory={...memory,place:c.place.id,lat:c.place.lat,lon:c.place.lon,center:[center.lat,center.lng],zoom:map.getZoom()};schedule();});
-  const result={map,receive,refresh:request,info(){return data?{...data,cells:undefined,times:undefined,layer:G.layers[field].label,accumulation:['rain','snow'].includes(field)?accumulation:null,validTime:times[selected]}:null;},resetView(){map.setView([c.place.lat,c.place.lon],7);},resize(){map.invalidateSize({pan:false});draw();},dispose(){
+  const result={map,receive,refresh:request,info(){return data?{...data,cells:undefined,times:undefined,layer:G.layers[field].label,accumulation:['rain','snow'].includes(field)?accumulation:null,validTime:times[selected]}:null;},resetView(){map.setView([c.place.lat,c.place.lon],10);},resize(){map.invalidateSize({pan:false});draw();},dispose(){
    if(disposed)return;disposed=true;pause();clearTimeout(requestTimer);clearInterval(poll);resizeObserver?.disconnect();if(flowFrame!==null)cancelAnimationFrame(flowFrame);if(paintFrame!==null)cancelAnimationFrame(paintFrame);action('cancelModelMap');if(active===result)active=null;
   }};
   if(typeof root.ResizeObserver==='function'){resizeObserver=new root.ResizeObserver(()=>{if(!disposed)result.resize();});resizeObserver.observe(canvas);}
