@@ -12,7 +12,10 @@ test('production UI loads data, navigates, searches, changes location/model and 
   if(holdWeather){holdWeather=false;await new Promise(resolve=>{release=resolve;});}if(signal?.aborted)throw new DOMException('Aborted','AbortError');if(failWeather)throw new TypeError('offline');const p={lat:Number(u.searchParams.get('latitude')),lon:Number(u.searchParams.get('longitude')),timezone:u.searchParams.get('timezone')};return {ok:true,json:async()=>forecastFixture({place:p})};};
  try{
   await import('../public/app.mjs?dom-test');await pause();await pause();
-  assert(document.querySelector('.weather-hero'));assert(document.body.textContent.includes('模型即時估算'));assert(document.querySelector('.warning-banner').textContent.includes('強烈季候風信號'));
+  assert(document.querySelector('.weather-hero'));assert(document.body.textContent.includes('模型即時估算'));
+  const band=document.querySelector('.home-condition-band');assert.equal(band.children[0].className,'hero-condition');assert.equal(band.children[1].className,'home-storm-entry');assert.equal(band.children[2].className,'hero-range');
+  assert(!band.querySelector('.home-storm-entry').textContent.includes('›'));assert.equal(document.querySelectorAll('.hero-metrics>div>small').length,3);
+  document.querySelector('[data-weather-details]').click();assert(document.querySelector('#info-content').textContent.includes('海平面氣壓'));document.querySelector('#info-dialog').close();assert(document.querySelector('.warning-banner').textContent.includes('強烈季候風信號'));
   const go=async hash=>{location.hash='#'+hash;window.dispatchEvent(new window.Event('hashchange'));await pause();};
   await go('forecast');assert(document.querySelector('.forecast-chart'));assert.equal(document.querySelectorAll('.daily-row').length,3);
   await go('warnings');assert(document.querySelector('.warning-description').textContent.includes('正式警告內容'));
@@ -28,3 +31,4 @@ test('production UI loads data, navigates, searches, changes location/model and 
   holdWeather=true;document.querySelector('#refresh').click();await pause();document.querySelector('#change-place').click();document.querySelector('.quick-places button').click();await pause();await pause();release();await pause();await pause();assert.equal(document.querySelector('#place-name').textContent,'香港');assert(document.querySelector('.forecast-chart'));
  }finally{globalThis.setInterval=oldInterval;globalThis.fetch=oldFetch;}
 });
+

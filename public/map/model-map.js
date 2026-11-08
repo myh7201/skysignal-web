@@ -26,14 +26,17 @@
   const retry=btn('重試',()=>request(true),'model-map-retry');retry.hidden=true;
   now.className='model-map-now';buttons.append(previous,play,next);bar.append(heading,buttons,slider,now);controls.append(selectors,extra,legend,bar,retry);dock.prepend(controls);
   function updateLegend(){
-   const config=G.layers[field],sum=['rain','snow'].includes(field)?accumulation:1;
+   const config=G.layers[field];
    gradient.style.background='linear-gradient(90deg,'+config.colors.join(',')+')';scale.replaceChildren();
-   for(const n of [config.stops[0],config.stops[Math.floor(config.stops.length/2)],config.stops.at(-1)])scale.append(make('span','',n*sum+' '+config.unit));
+   scale.append(make('span','model-map-unit',config.unit));
+   for(const n of config.stops)scale.append(make('span','',String(n)));
+   legend.setAttribute('aria-label',config.label+' 色階（'+config.unit+'）：'+config.stops.join('、'));
+   stage?.setAttribute('data-field',field);
    rainSelect.hidden=!['rain','snow'].includes(field);flowLabel.hidden=!['wind','gust'].includes(field);extra.hidden=rainSelect.hidden&&flowLabel.hidden;
   }
-  updateLegend();
+  let stage=null;updateLegend();
   if(!root.L){canvas.append(make('p','map-empty','地圖元件暫未載入，請重新開啟頁面。'));status.textContent='模型地圖未能啟動';return {map:null,dispose(){},resize(){},refresh(){},resetView(){}};}
-  const stage=make('div','interactive-radar model-map-stage');canvas.append(stage);
+  stage=make('div','interactive-radar model-map-stage');stage.setAttribute('data-field',field);canvas.append(stage);
   const map=L.map(stage,{zoomControl:false,minZoom:3,maxZoom:15,zoomAnimation:false,fadeAnimation:false,markerZoomAnimation:false,inertia:false});
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors · Weather: <a href="https://open-meteo.com/">Open-Meteo</a> (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>)',maxZoom:18}).addTo(map);
   const samePlace=memory.place===c.place.id&&Math.abs((memory.lat||0)-c.place.lat)<.02&&Math.abs(G.wrap((memory.lon||0)-c.place.lon))<.02;
@@ -142,3 +145,4 @@
  }
  const api={mount,receive:value=>active?.receive(value),models};root.ModelWeatherMap=api;
 })(typeof window==='undefined'?globalThis:window);
+

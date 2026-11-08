@@ -18,3 +18,77 @@ dialog{background:var(--card);color:var(--text);border:1px solid var(--line);bor
 @media(max-height:500px) and (orientation:landscape){.map-mode-models{flex-direction:row}.map-mode-models .map-dock{width:260px;max-width:40%;height:100%;max-height:100%;border-top:0;border-left:1px solid var(--line)}.map-mode-models .map-canvas{min-height:0;min-width:0}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
 .hero-top>div{min-width:0}.hero-top h2{min-width:0;overflow-wrap:anywhere}.favorite-button{flex-shrink:0}:root[data-theme=dark] body{background:radial-gradient(ellipse at 90% 0,#254e6860,transparent 55%),var(--bg)}
+
+
+/* Weather colours stay legible over a neutral geographic base. */
+.model-map-stage .leaflet-tile-pane{filter:grayscale(1) brightness(.82) contrast(1.12)}
+.model-map-gradient{height:9px;border-radius:0}
+.model-map-scale{position:relative;display:flex;justify-content:space-between;gap:2px;font-size:clamp(8px,2.35vw,11px);font-variant-numeric:tabular-nums;opacity:1;padding-left:30px}
+.model-map-scale>span:not(.model-map-unit){flex:1;text-align:center;min-width:0}
+.model-map-scale>.model-map-unit{position:absolute;left:0;top:0;font-size:9px}
+
+/* Home follows the supplied continuous blue weather screen. */
+body[data-route=home]{--bg:#264966;--card:#2c4d6a;--surface:#2c4d6a;--text:#e3edf3;--muted:#b2c9da;--line:#d7e7f51a;--blue:#c5e6fa;--blue-soft:#d9eff512;background:linear-gradient(165deg,#213f62,#2c4e68);color:var(--text)}
+body[data-route=home] .topbar{background:transparent;border-bottom:0;color:var(--text)}
+body[data-route=home] .weather-hero{background:transparent;box-shadow:none;border:0;border-radius:0;padding:6px 0 20px;overflow:visible}
+body[data-route=home] .weather-hero:before,body[data-route=home] .weather-hero:after{display:none}
+.hero-calendar{display:grid;justify-items:center;gap:3px;color:#c5d8e4;font-size:17px;margin:6px 0 12px}
+.hero-calendar small{font-size:15px}
+body[data-route=home] .hero-reading{position:relative;justify-content:center;min-height:142px;padding:0 60px;margin:4px 0 12px}
+body[data-route=home] .hero-temperature{font-family:system-ui,sans-serif;font-size:clamp(82px,10vw,116px);font-weight:250;letter-spacing:-.07em;line-height:1.2;white-space:nowrap}
+body[data-route=home] .hero-temperature small{font-size:.32em;font-weight:300;letter-spacing:-.04em;margin-left:4px}
+body[data-route=home] .hero-reading>.weather-art{position:absolute;right:0;width:85px;height:85px;filter:none;opacity:.9}
+.home-condition-band{display:grid;grid-template-columns:minmax(0,1fr);gap:0}
+body[data-route=home] .hero-condition{grid-row:1;text-align:center;font-size:26px;margin:0;line-height:1.6;letter-spacing:.15em}
+.home-storm-entry{grid-row:2;justify-self:start;display:inline-flex;align-items:center;gap:5px;min-height:30px;color:#c6dbe8;font-size:15px;line-height:1.3}
+.home-storm-entry svg{width:20px;height:20px}
+.hero-range{grid-row:3;text-align:center;font-size:17px;color:#bfd3e1;line-height:1.4}
+body[data-route=home] .hero-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) 40px;gap:8px;padding:0;border:0;margin:22px 0 10px}
+body[data-route=home] .hero-metrics>div{display:flex;flex-direction:column;text-align:center;gap:6px}
+body[data-route=home] .hero-metrics>div>span{font-size:16px;color:#c2d7e5}
+body[data-route=home] .hero-metrics strong{font-family:system-ui,sans-serif;font-size:31px;font-weight:300;white-space:nowrap}
+body[data-route=home] .hero-metrics strong small{font-size:13px;margin-left:3px}
+body[data-route=home] .hero-metrics>div>small{font-size:12px;color:#b1cbdd}
+.home-metrics-more{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;font-size:14px;color:inherit;padding:0}
+.home-metrics-more b{font-size:27px;font-weight:300}
+body[data-route=home] .hero-bottom{display:block;margin:18px 0 0;color:#b5cddd;font-size:11px}
+.hero-bottom summary{cursor:pointer;text-align:right;min-height:28px}
+body[data-route=home] .hero-bottom .source-line{display:inline;color:inherit;font-size:10px}
+body[data-route=home] .hero-bottom .hero-source{margin-left:14px;color:inherit}
+body[data-route=home] .panel{border:0;border-radius:0;background:transparent;box-shadow:none}
+body[data-route=home] .section-heading{border-top:1px solid var(--line);padding-top:17px;margin-top:12px}
+body[data-route=home] .section-heading h2{font-size:22px;font-weight:400;letter-spacing:.07em}
+body[data-route=home] .chart-panel{padding:0 0 20px}
+body[data-route=home] .chart-tabs button{font-size:15px;border-radius:0;padding:7px 13px}
+body[data-route=home] .chart-tabs button.active{border-bottom:1px solid #d7ecf7}
+body[data-route=home] .chart-scroll{margin-top:22px}
+body[data-route=home] .chart-readout{color:var(--muted)}
+body[data-route=home] .daily-panel{padding:0}
+body[data-route=home] .warning-banner{border-radius:0;background:transparent;border:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);color:var(--text);padding:14px 0;margin-top:0}
+body[data-route=home] .page-footer a{color:inherit}
+@media(max-width:700px){
+ body[data-route=home] #main{padding:4px 16px 30px}
+ body[data-route=home] .topbar{height:88px;padding-top:12px;align-items:flex-start}
+ body[data-route=home] .topbar #page-kicker{display:none}
+ body[data-route=home] .topbar h1{font-size:20px;font-weight:400;letter-spacing:.1em;padding-top:6px}
+ body[data-route=home] .hero-top{min-height:0;margin-top:-6px}
+ body[data-route=home] .hero-top h2{font-size:18px;font-weight:400}
+ body[data-route=home] .hero-country{font-size:12px}
+ body[data-route=home] .live-label{font-size:9px;border:0;padding:0;background:none;color:#b3cbdc}
+ body[data-route=home] .hero-calendar{margin:18px 0 16px;font-size:15px}
+ body[data-route=home] .hero-calendar small{font-size:13px}
+ body[data-route=home] .hero-reading{min-height:118px;margin:6px 0 16px;padding:0 40px}
+ body[data-route=home] .hero-temperature{font-size:clamp(72px,19vw,96px)}
+ body[data-route=home] .hero-reading>.weather-art{width:63px;height:63px;right:0}
+ body[data-route=home] .hero-condition{font-size:24px}
+ body[data-route=home] .hero-range{font-size:15px}
+ body[data-route=home] .hero-metrics{margin-top:25px}
+ body[data-route=home] .hero-metrics strong{font-size:27px}
+ body[data-route=home] .hero-metrics>div>span{font-size:15px}
+ body[data-route=home] .hero-metrics strong small{font-size:11px}
+ body[data-route=home] .sidebar{background:#2b4b69;border-top:1px solid #bdd8e318}
+ body[data-route=home] .nav-destination,body[data-route=home] .nav-destination.active{color:#c7dce9}
+ body[data-route=home] .nav-destination.active{background:#d2e6f008}
+ body[data-route=home] .hero-bottom{margin-top:14px}
+}
+@media(max-width:350px){body[data-route=home] .hero-reading{padding-left:0;padding-right:30px}body[data-route=home] .hero-reading>.weather-art{width:49px}body[data-route=home] .hero-metrics strong{font-size:23px}body[data-route=home] .hero-metrics{grid-template-columns:repeat(3,minmax(0,1fr)) 33px;gap:4px}}

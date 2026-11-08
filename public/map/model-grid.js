@@ -1,10 +1,10 @@
 (function(root){'use strict';
  const finite=x=>typeof x==='number'&&Number.isFinite(x);
  const layers={
-  temperature:{label:'氣溫',unit:'°C',stops:[-30,-15,0,15,30,45],colors:['#61429c','#4a76bb','#6dc0db','#68c78d','#f3c861','#dc605a']},
-  wind:{label:'風速及風向',unit:'km/h',stops:[0,10,25,50,80,120],colors:['#a4d7dc','#70bdb0','#83bf76','#e1c355','#da7858','#ad4c89']},
-  rain:{label:'降水量',unit:'mm',stops:[0,.1,1,3,10,30,60],colors:['#dcecf4','#a3d9ee','#68b6d9','#4d93c6','#7774bd','#b75c9b','#d47666'],dry:true},
-  gust:{label:'陣風',unit:'km/h',stops:[0,10,25,50,80,120],colors:['#a4d7dc','#70bdb0','#83bf76','#e1c355','#da7858','#ad4c89']},
+  temperature:{label:'氣溫',unit:'°C',stops:[-30,-20,-10,0,10,20,30,40,50],colors:["#8071bb","#9c8bd0","#91cfd3","#418cab","#65a54a","#e0b622","#f79308","#c74714","#7e2019"]},
+  wind:{label:'風速及風向',unit:'km/h',stops:[0,10,20,35,55,70,100,140],colors:["#666eb3","#397da4","#4d9991","#36a638","#b5a24b","#a04779","#467c98","#76508b"]},
+  rain:{label:'降水量',unit:'mm',stops:[0,0.1,1.5,2,3,7,10,20,30,60],colors:["#777c80","#407c9f","#397fa5","#388faa","#2eaeb4","#31b553","#a6b334","#bb653e","#ac389c","#72378c"],dry:true},
+  gust:{label:'陣風',unit:'km/h',stops:[0,10,20,35,55,70,100,140],colors:["#666eb3","#397da4","#4d9991","#36a638","#b5a24b","#a04779","#467c98","#76508b"]},
   cloud:{label:'雲量',unit:'%',stops:[0,20,50,80,100],colors:['#537cac','#7c9bbc','#a5b8ce','#d1dbe5','#f1f4f7']},
   humidity:{label:'相對濕度',unit:'%',stops:[0,20,40,60,80,100],colors:['#d4b48b','#c6c59d','#99c8af','#70bdbe','#5f9ec0','#657db7']},
   snow:{label:'降雪量',unit:'cm',stops:[0,.1,1,3,10,20],colors:['#e3ecf6','#c0d8ec','#96b6dc','#8293c8','#9d77b8','#b96997'],dry:true},
@@ -35,11 +35,11 @@
   return value;
  }
  function color(key,value,accumulation=1){
-  if(!finite(value))return [0,0,0,0];const config=layers[key],stops=config.stops.map(v=>config.dry?v*accumulation:v);
-  if(config.dry&&value<.05)return [0,0,0,0];
+  if(!finite(value))return [0,0,0,0];const config=layers[key],stops=config.stops;
+  if(key==='snow'&&value<.05)return [0,0,0,0];
   let i=0;while(i<stops.length-2&&value>stops[i+1])i++;
   const t=Math.max(0,Math.min(1,(value-stops[i])/(stops[i+1]-stops[i]))),rgb=hex=>[1,3,5].map(j=>parseInt(hex.slice(j,j+2),16)),a=rgb(config.colors[i]),b=rgb(config.colors[i+1]);
-  return [...a.map((v,j)=>Math.round(v+(b[j]-v)*t)),155];
+  return [...a.map((v,j)=>Math.round(v+(b[j]-v)*t)),key==='rain'&&value<.05?135:205];
  }
  function contours(data,values,step=4){
   const valid=values.filter(finite);if(!valid.length)return [];const low=Math.floor(Math.min(...valid)/step)*step,high=Math.ceil(Math.max(...valid)/step)*step,result=[];
@@ -59,3 +59,4 @@
  }
  const api={layers,finite,wrap,unwrap,fieldValues,sample,color,contours,vector,sameRegion};root.ModelGrid=api;if(typeof module==='object')module.exports=api;
 })(typeof window==='undefined'?globalThis:window);
+
