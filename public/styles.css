@@ -92,3 +92,27 @@ body[data-route=home] .page-footer a{color:inherit}
  body[data-route=home] .hero-bottom{margin-top:14px}
 }
 @media(max-width:350px){body[data-route=home] .hero-reading{padding-left:0;padding-right:30px}body[data-route=home] .hero-reading>.weather-art{width:49px}body[data-route=home] .hero-metrics strong{font-size:23px}body[data-route=home] .hero-metrics{grid-template-columns:repeat(3,minmax(0,1fr)) 33px;gap:4px}}
+
+/* Storm shortcut overlays the seam: only condition and range consume rows. */
+body[data-route=home] .home-condition-band{position:relative;row-gap:0}
+body[data-route=home] .home-condition-band .hero-condition{grid-row:1;margin:0}
+body[data-route=home] .home-condition-band .hero-range{grid-row:2;margin:0}
+body[data-route=home] .home-condition-band .home-storm-entry{position:absolute;left:0;top:100%;transform:translateY(-50%);grid-column:1 / 2;grid-row:1 / 2;max-width:28%;min-height:32px;font-size:clamp(11px,3.3vw,15px);gap:3px;line-height:1.3}
+/* Shared dialog framing: no square outline or separately tinted child edges. */
+dialog{box-sizing:border-box;border:0;outline:0;border-radius:22px;background-clip:padding-box;isolation:isolate;overscroll-behavior:contain;overflow-x:hidden;overflow-y:auto}
+dialog .dialog-head{min-width:0;background:transparent}
+dialog .dialog-head>div,dialog .dialog-head h2{min-width:0;overflow-wrap:anywhere}
+dialog .dialog-head .icon-button{border:0;border-radius:50%;background:transparent;box-shadow:none}
+dialog .dialog-head .icon-button:focus-visible{outline:0;box-shadow:inset 0 0 0 2px var(--text)}
+
+/* Leaflet point readings share the rounded, clipped detail surface. */
+.model-point-inspect{position:absolute;left:10px;top:10px;z-index:450;min-height:36px;padding:7px 11px!important;border:0!important;border-radius:18px!important;background:var(--card)!important;color:var(--text)!important;font-size:12px!important;box-shadow:0 2px 8px #12354624}
+.model-point-popup .leaflet-popup-content-wrapper{border:0;outline:0;border-radius:16px;background:var(--card);color:var(--text);overflow:hidden;box-shadow:0 4px 18px #12354633}
+.model-point-popup .leaflet-popup-tip{background:var(--card);box-shadow:none}
+.model-point-popup .leaflet-popup-content{margin:15px 30px 15px 16px;line-height:1.5;min-width:160px;max-width:210px;overflow-wrap:anywhere}
+.model-point-popup a.leaflet-popup-close-button{right:4px;top:4px;width:28px;height:28px;line-height:28px;border:0;border-radius:50%;color:var(--muted);font-size:21px}
+.model-point-title{display:block;font-size:12px;font-weight:500;color:var(--muted)}
+.model-point-temperature{font-size:25px;font-weight:500;line-height:1.4;margin:3px 0 5px;font-variant-numeric:tabular-nums}
+.model-point-field{font-size:12px;margin-bottom:5px}
+.model-point-reading small{display:block;font-size:10px;color:var(--muted);line-height:1.65;font-variant-numeric:tabular-nums}
+.model-point-error{color:var(--text)!important}

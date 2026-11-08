@@ -1,9 +1,14 @@
 {
   "name": "skysignal-web",
-  "version": "0.50.0",
+  "version": "0.51.0",
   "private": true,
   "type": "module",
   "description": "晴訊：繁體中文天氣與模型地圖網頁版",
-  "scripts": {"test": "node --test tests/*.test.mjs", "check": "node --check public/app.mjs && node --check public/core.mjs && node --check public/map/model-map.js && node --check public/sw.js"},
-  "devDependencies": {"linkedom": "^0.18.12"}
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "check": "node --check public/app.mjs && node --check public/core.mjs && node --check public/map/model-map.js && node --check public/sw.js"
+  },
+  "devDependencies": {
+    "linkedom": "^0.18.12"
+  }
 }

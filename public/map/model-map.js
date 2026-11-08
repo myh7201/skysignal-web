@@ -49,6 +49,36 @@
    const point=p.id===c.place.id;
    L.circleMarker([p.lat,p.lon],{radius:point?5:4,color:point?'#fff':'#243b53',weight:point?2:1,fillColor:point?'#267bb5':'#fff',fillOpacity:1,pane:'markerPane'}).addTo(map).bindTooltip(p.displayName||p.name||'地點');
   }
+
+  let picked=null,pointPopup=null,pointMarker=null,pointError='';
+  function updatePoint(){
+   if(disposed||!picked)return;
+   const content=make('div','model-point-reading'),heading=make('strong','model-point-title','選定位置');
+   content.setAttribute('role','status');content.setAttribute('aria-live','polite');content.append(heading);
+   const current=data?.model===model&&times.length,index=current?data.times.indexOf(times[selected]):-1;
+   const at=key=>current&&index>=0?G.sample(data,G.fieldValues(data,key,index,['rain','snow'].includes(key)?accumulation:1),picked.lat,picked.lon):null;
+   const temperature=at('temperature'),reading=make('div','model-point-temperature',G.finite(temperature)?temperature.toFixed(1)+' °C':current?'此座標暫無氣溫資料':pointError?'氣溫暫未能載入':'正在載入氣溫…');content.append(reading);
+   if(field!=='temperature'){
+    const value=at(field),config=G.layers[field],label=G.finite(value)?new Intl.NumberFormat('zh-HK',{maximumFractionDigits:field==='pressure'?0:1}).format(value)+' '+config.unit:'未提供';
+    content.append(make('div','model-point-field',config.label+' · '+label));
+   }
+   content.append(make('small','model-point-coordinates',picked.lat.toFixed(4)+', '+G.wrap(picked.lon).toFixed(4)),make('small','model-point-source',(models.find(m=>m[0]===model)?.[1]||model)+' · 模型預報'));
+   if(current)content.append(make('small','model-point-time',stamp(times[selected])));
+   if(pointError||data?.model===model&&data.error)content.append(make('small','model-point-error',pointError||data.error));
+   if(!pointPopup)pointPopup=L.popup({className:'model-point-popup',maxWidth:250,minWidth:170,autoPan:true,autoPanPadding:[16,16],closeButton:true});
+   pointPopup.setLatLng([picked.lat,picked.lon]).setContent(content).openOn(map);
+  }
+  function pickPoint(event){
+   if(disposed||!G.finite(event.latlng?.lat)||!G.finite(event.latlng?.lng))return;
+   picked={lat:event.latlng.lat,lon:event.latlng.lng};
+   if(pointMarker)pointMarker.setLatLng([picked.lat,picked.lon]);
+   else pointMarker=L.circleMarker([picked.lat,picked.lon],{radius:5,color:'#fff',weight:2,fillColor:'#213e55',fillOpacity:1,interactive:false,pane:'markerPane'}).addTo(map);
+   updatePoint();
+  }
+  map.on('click',pickPoint);
+  map.on('popupclose',event=>{if(!disposed&&event.popup===pointPopup){picked=null;pointMarker?.remove();pointMarker=null;}});
+  const inspect=btn('查看中心氣溫',()=>pickPoint({latlng:map.getCenter()}),'model-point-inspect');inspect.setAttribute('aria-label','查看地圖中心氣溫');canvas.append(inspect);
+
   function bounds(){const b=map.getBounds(),west=b.getWest(),east=b.getEast();return [Math.max(-85,b.getSouth()),west,Math.min(85,b.getNorth()),Math.min(west+360,east)];}
   function expanded(){const b=bounds(),dy=Math.max(.01,(b[2]-b[0])*.12),dx=Math.max(.01,(b[3]-b[1])*.12),center=G.wrap((b[1]+b[3])/2),span=Math.min(360,b[3]-b[1]+dx*2);return [Math.max(-85,Math.floor((b[0]-dy)*1000)/1000),Math.floor((center-span/2)*1000)/1000,Math.min(85,Math.ceil((b[2]+dy)*1000)/1000),Math.min(Math.floor((center-span/2)*1000)/1000+360,Math.ceil((center+span/2)*1000)/1000)];}
   function closest(time){if(!times.length)return 0;let best=0;for(let i=1;i<times.length;i++)if(Math.abs(times[i]-time)<Math.abs(times[best]-time))best=i;return best;}
@@ -65,7 +95,7 @@
     for(let i=0;i<speed.length;i++){const vector=G.vector(speed[i],direction[i]);u.push(vector?.u??null);v.push(vector?.v??null);}
    }
    if(data?.model===model&&values.some(G.finite)){const dry=['rain','snow'].includes(field)&&values.filter(G.finite).every(x=>x===0);status.textContent=data.error||(models.find(m=>m[0]===model)?.[1]||model)+' · 模型預報'+(dry?(field==='snow'?' · 範圍內未預報降雪':' · 範圍內未預報降水'):'')+' · '+Math.max(1,Math.round(data.samplingKm))+' 公里區域取樣 · Open-Meteo';}
-   draw();startFlow();
+   draw();startFlow();updatePoint();
   }
   function draw(){
    if(disposed)return;const size=map.getSize(),w=size.x,h=size.y;if(w<1||h<1)return;
@@ -107,13 +137,14 @@
   }
   function receive(result){
    if(disposed||result.requestId!==pending||result.model&&result.model!==model)return;pending='';pendingKey='';retry.hidden=true;
-   if(!result.cells){status.textContent=result.error||'模型地圖未能載入';retry.hidden=false;return;}
+   if(!result.cells){pointError=result.error||'模型地圖未能載入';status.textContent=pointError;retry.hidden=false;updatePoint();return;}
+   pointError='';
    data=result;recent.unshift(result);while(recent.length>2)recent.pop();
    times=data.times.filter(t=>t>=Math.floor(Date.now()/3600000)*3600000&&t<=Date.now()+72*3600000);slider.max=Math.max(0,times.length-1);slider.disabled=!times.length;play.disabled=times.length<2;
    for(const option of layerSelect.children)option.disabled=Boolean(data.completeFields&&!data.available.includes(option.value));
    const name=models.find(m=>m[0]===model)?.[1]||model;
    status.textContent=data.error||name+' · 模型預報 · '+Math.max(1,Math.round(data.samplingKm))+' 公里區域取樣 · Open-Meteo';
-   if(!data.available.includes(field)){status.textContent=name+' 暫未提供這個圖層，請選其他圖層或模型';values=[];draw();return;}
+   if(!data.available.includes(field)){chooseTime(closest(memory.time||Date.now()));status.textContent=name+' 暫未提供這個圖層，請選其他圖層或模型';return;}
    chooseTime(closest(memory.time||Date.now()));
   }
   function request(force=false){
@@ -124,21 +155,21 @@
     if(data?.model===model&&G.sameRegion(data,b)&&slot(data.checked||data.fetched)===slot(Date.now())&&(data.available.includes(field)||data.completeFields))return;
    }
    const region=expanded(),key=JSON.stringify([model,region,field]);if(pendingKey===key&&!force)return;
-   pending='map:'+Date.now()+':'+ ++sequence;pendingKey=key;status.textContent='正在載入 '+(models.find(m=>m[0]===model)?.[1]||model)+' 區域預報…';retry.hidden=true;
+   pending='map:'+Date.now()+':'+ ++sequence;pendingKey=key;pointError='';updatePoint();status.textContent='正在載入 '+(models.find(m=>m[0]===model)?.[1]||model)+' 區域預報…';retry.hidden=true;
    action('modelMap',{requestId:pending,model,field,bounds:region,force});
   }
   function schedule(){clearTimeout(requestTimer);requestTimer=setTimeout(()=>request(),650);}
   layerSelect.onchange=()=>{field=layerSelect.value;localStorage.setItem('modelMapLayer',field);updateLegend();updateFields();
    if(data?.model===model&&data.completeFields&&!data.available.includes(field))status.textContent='此模型暫未提供這個圖層，請切換模型';else schedule();
   };
-  modelSelect.onchange=()=>{action('cancelModelMap');pending='';pendingKey='';model=modelSelect.value;localStorage.setItem('modelMapModel',model);for(const option of layerSelect.children)option.disabled=false;updateFields();schedule();};
+  modelSelect.onchange=()=>{action('cancelModelMap');pending='';pendingKey='';model=modelSelect.value;pointError='';localStorage.setItem('modelMapModel',model);for(const option of layerSelect.children)option.disabled=false;updateFields();schedule();};
   rainSelect.onchange=()=>{accumulation=Number(rainSelect.value);localStorage.setItem('modelMapAccumulation',accumulation);updateLegend();updateFields();};
   flowToggle.onchange=()=>{flow=flowToggle.checked;localStorage.setItem('modelMapFlow',flow?'on':'off');flowCtx.clearRect(0,0,stream.width,stream.height);startFlow();};
   slider.oninput=()=>{pause();chooseTime(Number(slider.value));};
   map.on('move',()=>{if(paintFrame!==null)return;paintFrame=requestAnimationFrame(()=>{paintFrame=null;draw();});});
   map.on('moveend',()=>{const center=map.getCenter();memory={...memory,place:c.place.id,lat:c.place.lat,lon:c.place.lon,center:[center.lat,center.lng],zoom:map.getZoom()};schedule();});
   const result={map,receive,refresh:request,info(){return data?{...data,cells:undefined,times:undefined,layer:G.layers[field].label,accumulation:['rain','snow'].includes(field)?accumulation:null,validTime:times[selected]}:null;},resetView(){map.setView([c.place.lat,c.place.lon],10);},resize(){map.invalidateSize({pan:false});draw();},dispose(){
-   if(disposed)return;disposed=true;pause();clearTimeout(requestTimer);clearInterval(poll);resizeObserver?.disconnect();if(flowFrame!==null)cancelAnimationFrame(flowFrame);if(paintFrame!==null)cancelAnimationFrame(paintFrame);action('cancelModelMap');if(active===result)active=null;
+   if(disposed)return;disposed=true;pointPopup?.remove();pointMarker?.remove();map.off('click',pickPoint);pause();clearTimeout(requestTimer);clearInterval(poll);resizeObserver?.disconnect();if(flowFrame!==null)cancelAnimationFrame(flowFrame);if(paintFrame!==null)cancelAnimationFrame(paintFrame);action('cancelModelMap');if(active===result)active=null;
   }};
   if(typeof root.ResizeObserver==='function'){resizeObserver=new root.ResizeObserver(()=>{if(!disposed)result.resize();});resizeObserver.observe(canvas);}
   active=result;poll=setInterval(()=>request(),60000);schedule();return result;
