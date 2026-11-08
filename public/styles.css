@@ -109,7 +109,7 @@ dialog .dialog-head .icon-button:focus-visible{outline:0;box-shadow:inset 0 0 0 
 .model-point-inspect{position:absolute;left:10px;top:10px;z-index:450;min-height:36px;padding:7px 11px!important;border:0!important;border-radius:18px!important;background:var(--card)!important;color:var(--text)!important;font-size:12px!important;box-shadow:0 2px 8px #12354624}
 .model-point-popup .leaflet-popup-content-wrapper{border:0;outline:0;border-radius:16px;background:var(--card);color:var(--text);overflow:hidden;box-shadow:0 4px 18px #12354633}
 .model-point-popup .leaflet-popup-tip{background:var(--card);box-shadow:none}
-.model-point-popup .leaflet-popup-content{margin:15px 30px 15px 16px;line-height:1.5;min-width:160px;max-width:210px;overflow-wrap:anywhere}
+.model-point-popup .leaflet-popup-content{margin:15px 30px 15px 16px;line-height:1.5;min-width:140px;max-width:190px;overflow-wrap:anywhere}
 .model-point-popup a.leaflet-popup-close-button{right:4px;top:4px;width:28px;height:28px;line-height:28px;border:0;border-radius:50%;color:var(--muted);font-size:21px}
 .model-point-title{display:block;font-size:12px;font-weight:500;color:var(--muted)}
 .model-point-temperature{font-size:25px;font-weight:500;line-height:1.4;margin:3px 0 5px;font-variant-numeric:tabular-nums}

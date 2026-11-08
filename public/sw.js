@@ -1,5 +1,5 @@
-const CACHE='skysignal-shell-0.51.0';
-const ASSETS=['./','./index.html','./styles.css?v=0.51.0','./app.mjs?v=0.51.0','./core.mjs','./icon.svg','./manifest.webmanifest','./vendor/leaflet.js','./vendor/leaflet.css','./map/model-grid.js?v=0.51.0','./map/model-map.js?v=0.51.0'];
+const CACHE='skysignal-shell-0.51.1';
+const ASSETS=['./','./index.html','./styles.css?v=0.51.1','./app.mjs?v=0.51.1','./core.mjs','./icon.svg','./manifest.webmanifest','./vendor/leaflet.js','./vendor/leaflet.css','./map/model-grid.js?v=0.51.1','./map/model-map.js?v=0.51.1'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS.map(url=>new Request(new URL(url,self.registration.scope),{cache:'reload'})))).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('skysignal-shell-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',event=>{

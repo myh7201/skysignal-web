@@ -65,8 +65,9 @@
    content.append(make('small','model-point-coordinates',picked.lat.toFixed(4)+', '+G.wrap(picked.lon).toFixed(4)),make('small','model-point-source',(models.find(m=>m[0]===model)?.[1]||model)+' · 模型預報'));
    if(current)content.append(make('small','model-point-time',stamp(times[selected])));
    if(pointError||data?.model===model&&data.error)content.append(make('small','model-point-error',pointError||data.error));
-   if(!pointPopup)pointPopup=L.popup({className:'model-point-popup',maxWidth:250,minWidth:170,autoPan:true,autoPanPadding:[16,16],closeButton:true});
+   if(!pointPopup)pointPopup=L.popup({className:'model-point-popup',maxWidth:Math.max(140,Math.min(190,map.getSize().x-144)),minWidth:140,autoPan:true,autoPanPaddingTopLeft:[16,64],autoPanPaddingBottomRight:[80,16],closeButton:true});
    pointPopup.setLatLng([picked.lat,picked.lon]).setContent(content).openOn(map);
+   pointPopup.getElement?.()?.querySelector('.leaflet-popup-close-button')?.setAttribute('aria-label','關閉地圖讀數');
   }
   function pickPoint(event){
    if(disposed||!G.finite(event.latlng?.lat)||!G.finite(event.latlng?.lng))return;
