@@ -1,4 +1,4 @@
-import './warning-policy.js?v=0.54.0';
+import './warning-policy.js?v=0.55.0';
 const warningDisplayPolicy=globalThis.WeatherPolicy||globalThis.window?.WeatherPolicy;
 export const MODELS = Object.freeze({ifs:{name:'ECMWF IFS',api:'ecmwf_ifs025'},gfs:{name:'NOAA GFS',api:'ncep_gfs_global'},icon:{name:'DWD ICON',api:'icon_global'},gem:{name:'GEM Global',api:'cmc_gem_gdps'},aifs:{name:'ECMWF AIFS',api:'ecmwf_aifs025_single'}});
 export const DEFAULT_PLACE = Object.freeze({id:'hong-kong',name:'香港',lat:22.3027,lon:114.1772,timezone:'Asia/Hong_Kong',countryCode:'HK',country:'香港'});
@@ -41,7 +41,7 @@ export function parseGrid(raw,bounds,model,now=Date.now()){
 export function forecastUrl(place,model){
  place=normalizePlace(place);if(!MODELS[model])throw Error('未知氣象模型');
  const current='temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,cloud_cover,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m';
- const q=new URLSearchParams({latitude:String(place.lat),longitude:String(place.lon),models:MODELS[model].api,current,hourly:current.replace(',is_day','')+',visibility,uv_index',daily:'weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_sum,wind_speed_10m_max,uv_index_max',forecast_days:'10',timezone:place.locatedAt?'auto':place.timezone,timeformat:'unixtime',wind_speed_unit:'kmh',temperature_unit:'celsius',precipitation_unit:'mm'});
+ const q=new URLSearchParams({latitude:String(place.lat),longitude:String(place.lon),models:MODELS[model].api,current,hourly:current.replace(',is_day','')+',visibility,uv_index,precipitation_probability',daily:'weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_sum,wind_speed_10m_max,uv_index_max',forecast_days:'10',timezone:place.locatedAt?'auto':place.timezone,timeformat:'unixtime',wind_speed_unit:'kmh',temperature_unit:'celsius',precipitation_unit:'mm'});
  return 'https://api.open-meteo.com/v1/forecast?'+q;
 }
 const value=(n,lo=-Infinity,hi=Infinity)=>finite(n)&&n>=lo&&n<=hi?n:null;
@@ -53,14 +53,14 @@ export function parseForecast(raw,place,model,now=Date.now()){
  const hours=t.map((time,i)=>{
   if(!finite(time)||(i&&time-t[i-1]!==3600))throw Error('逐小時預報時間軸不連續');
   const row={time:time*1000};for(const [key,[variable,unit,lo,hi]]of Object.entries(FIELDS)){const series=raw.hourly[variable];row[key]=raw.hourly_units[variable]===unit&&Array.isArray(series)&&series.length===t.length?value(series[i],lo,hi):null;}
-  row.apparent=value(raw.hourly.apparent_temperature?.[i],-120,90);row.code=value(raw.hourly.weather_code?.[i],0,99);row.visibility=value(raw.hourly.visibility?.[i],0,1000000);row.uv=value(raw.hourly.uv_index?.[i],0,40);return row;
+  row.chance=raw.hourly_units.precipitation_probability==='%'?value(raw.hourly.precipitation_probability?.[i],0,100):null;row.apparent=value(raw.hourly.apparent_temperature?.[i],-120,90);row.code=value(raw.hourly.weather_code?.[i],0,99);row.visibility=value(raw.hourly.visibility?.[i],0,1000000);row.uv=value(raw.hourly.uv_index?.[i],0,40);return row;
  });
  if(!hours.some(h=>finite(h.temperature)))throw Error('來源沒有可用的氣溫預報');
  const d=raw.daily,du=raw.daily_units||{},days=d.time.map((time,i)=>({time:finite(time)?time*1000:null,min:du.temperature_2m_min==='°C'?value(d.temperature_2m_min?.[i],-100,70):null,max:du.temperature_2m_max==='°C'?value(d.temperature_2m_max?.[i],-100,70):null,rain:du.precipitation_sum==='mm'?value(d.precipitation_sum?.[i],0,10000):null,wind:du.wind_speed_10m_max==='km/h'?value(d.wind_speed_10m_max?.[i],0,600):null,code:value(d.weather_code?.[i],0,99),sunrise:finite(d.sunrise?.[i])?d.sunrise[i]*1000:null,sunset:finite(d.sunset?.[i])?d.sunset[i]*1000:null,uv:value(d.uv_index_max?.[i],0,40)})).filter(d=>d.time&&finite(d.min)&&finite(d.max)&&d.min<=d.max);
  if(!days.length)throw Error('來源沒有可用的每日預報');
  const c=raw.current||{},cu=raw.current_units||{},closest=hours.reduce((a,b)=>Math.abs(a.time-now)<Math.abs(b.time-now)?a:b),current={...closest};
  if(finite(c.time)&&Math.abs(c.time*1000-now)<3600000){for(const [key,[variable,unit,lo,hi]]of Object.entries(FIELDS))if(cu[variable]===unit)current[key]=value(c[variable],lo,hi);current.time=c.time*1000;current.apparent=value(c.apparent_temperature,-120,90);current.code=value(c.weather_code,0,99);current.isDay=c.is_day===1;}
- return {place,model,checked:now,current,hours,days,gridLat:raw.latitude,gridLon:raw.longitude,source:'Open-Meteo',timezone:place.timezone};
+ return {place,model,checked:now,current,hours,days,elevation:value(raw.elevation,-500,9000),gridLat:raw.latitude,gridLon:raw.longitude,source:'Open-Meteo',timezone:place.timezone};
 }
 export function weather(code){
  if(!finite(code))return {name:'天氣狀況暫缺',kind:'cloud'};
