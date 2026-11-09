@@ -1,4 +1,4 @@
-import './warning-policy.js?v=0.53.0';
+import './warning-policy.js?v=0.53.1';
 const warningDisplayPolicy=globalThis.WeatherPolicy||globalThis.window?.WeatherPolicy;
 export const MODELS = Object.freeze({ifs:{name:'ECMWF IFS',api:'ecmwf_ifs025'},gfs:{name:'NOAA GFS',api:'ncep_gfs_global'},icon:{name:'DWD ICON',api:'icon_global'},gem:{name:'GEM Global',api:'cmc_gem_gdps'},aifs:{name:'ECMWF AIFS',api:'ecmwf_aifs025_single'}});
 export const DEFAULT_PLACE = Object.freeze({id:'hong-kong',name:'香港',lat:22.3027,lon:114.1772,timezone:'Asia/Hong_Kong',countryCode:'HK',country:'香港'});

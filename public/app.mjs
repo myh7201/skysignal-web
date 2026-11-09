@@ -1,4 +1,4 @@
-import {MODELS,DEFAULT_PLACE,FIELDS,finite,escapeHTML as esc,normalizePlace,forecastUrl,parseForecast,gridUrl,parseGrid,weather,number,stamp,direction,wind,hourWindow,chartPoints,fetchJSON,makeStore,chargeMap,officialSource,isHongKong,warningsFor,distance} from './core.mjs?v=0.53.0';
+import {MODELS,DEFAULT_PLACE,FIELDS,finite,escapeHTML as esc,normalizePlace,forecastUrl,parseForecast,gridUrl,parseGrid,weather,number,stamp,direction,wind,hourWindow,chartPoints,fetchJSON,makeStore,chargeMap,officialSource,isHongKong,warningsFor,distance} from './core.mjs?v=0.53.1';
 const $=s=>document.querySelector(s);
 let storage;try{storage=localStorage;}catch{const memory=new Map();storage={getItem:k=>memory.get(k)??null,setItem:(k,v)=>memory.set(k,v),removeItem:k=>memory.delete(k)};}
 const store=makeStore(storage);

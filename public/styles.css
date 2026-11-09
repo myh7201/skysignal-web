@@ -135,3 +135,11 @@ dialog{background:#edf5fc!important;color:#253f5d;backdrop-filter:none;opacity:1
 .chart-scroll{touch-action:pan-x pan-y;overflow-x:auto;max-width:100%}#weather-chart{touch-action:pan-x pan-y;max-height:none;height:190px}
 .selected-chart-reading{margin:14px 0;padding:12px 0;border-block:1px solid var(--line)}.selected-chart-reading>strong{font-size:13px;font-weight:500}.selected-chart-reading dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}.selected-chart-reading dt{font-size:11px;color:var(--muted)}.selected-chart-reading dd{margin:6px 0;font-size:17px;overflow-wrap:anywhere}
 .day-detail-reading{display:flex;justify-content:space-between;align-items:center;gap:10px}.day-detail-reading>strong{font-size:32px}
+.day-detail-reading>.weather-art{width:70px;height:70px;min-width:0;flex:0 0 70px}
+.day-detail-reading>strong{min-width:0;overflow-wrap:anywhere}
+dialog{--dialog-surface:#edf5fc}
+:root[data-theme=dark] dialog{--dialog-surface:#294762}
+dialog .dialog-head{position:sticky;top:-28px;z-index:3;margin:-28px -28px 20px;padding:20px 24px 14px;background:var(--dialog-surface)!important;border-bottom:1px solid var(--line);align-items:center}
+dialog .dialog-head .icon-button{flex:none;margin:0}
+.chart-toolbar{min-width:0;max-width:100%}.chart-tabs{flex:1 1 0%;min-width:0;max-width:100%;overflow-x:auto}.chart-tabs button{flex:none}
+@media(max-width:760px){dialog{width:100dvw!important}}
