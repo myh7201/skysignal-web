@@ -1,6 +1,6 @@
 {
   "name": "skysignal-web",
-  "version": "0.53.1",
+  "version": "0.54.0",
   "private": true,
   "type": "module",
   "description": "晴訊：繁體中文天氣與模型地圖網頁版",
