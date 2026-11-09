@@ -1,3 +1,5 @@
+import './warning-policy.js?v=0.52.0';
+const warningDisplayPolicy=globalThis.WeatherPolicy||globalThis.window?.WeatherPolicy;
 export const MODELS = Object.freeze({ifs:{name:'ECMWF IFS',api:'ecmwf_ifs025'},gfs:{name:'NOAA GFS',api:'ncep_gfs_global'},icon:{name:'DWD ICON',api:'icon_global'},gem:{name:'GEM Global',api:'cmc_gem_gdps'},aifs:{name:'ECMWF AIFS',api:'ecmwf_aifs025_single'}});
 export const DEFAULT_PLACE = Object.freeze({id:'hong-kong',name:'香港',lat:22.3027,lon:114.1772,timezone:'Asia/Hong_Kong',countryCode:'HK',country:'香港'});
 export const FIELDS = Object.freeze({temperature:['temperature_2m','°C',-100,70],humidity:['relative_humidity_2m','%',0,100],wind:['wind_speed_10m','km/h',0,500],direction:['wind_direction_10m','°',0,360],rain:['precipitation','mm',0,5000],gust:['wind_gusts_10m','km/h',0,600],cloud:['cloud_cover','%',0,100],snow:['snowfall','cm',0,2000],pressure:['pressure_msl','hPa',800,1150]});
@@ -98,7 +100,7 @@ export function parseHKWarnings(summary,details,now=Date.now()){
  if(!summary||typeof summary!=='object'||Array.isArray(summary)||Object.values(summary).some(s=>!s||typeof s!=='object'||typeof s.actionCode!=='string'))throw Error('官方警告摘要格式無效');
  const names={WMSGNL:'強烈季候風信號',WFIRE:'火災危險警告',WFROST:'霜凍警告',WHOT:'酷熱天氣警告',WCOLD:'寒冷天氣警告',WRAIN:'暴雨警告信號',WFNTSA:'新界北部水浸特別報告',WL:'山泥傾瀉警告',WTCSGNL:'熱帶氣旋警告信號',WTS:'雷暴警告',WTMW:'海嘯警告'};
  const list=Object.entries(summary).filter(([,s])=>s&&typeof s==='object'&&s.actionCode!=='CANCEL').map(([key,s])=>{const full=details?.details?.find(d=>d.warningStatementCode===key||d.warningStatementCode===s.code);return {id:s.code||key,title:String(s.name||names[key]||key),scope:'香港',level:s.type||'',issued:s.issueTime,updated:s.updateTime,description:Array.isArray(full?.contents)?full.contents.join('\n\n'):'官方暫未提供全文，請查看香港天文台。',source:'香港天文台',url:'https://www.hko.gov.hk/tc/wxinfo/warning.htm'};});
- return {status:'ok',checked:now,items:list,source:'香港天文台',scope:'香港'};
+ return {status:'ok',checked:now,items:warningDisplayPolicy.ordered(list),source:'香港天文台',scope:'香港'};
 }
 export async function warningsFor(place,signal){
  if(isHongKong(place)){
@@ -111,3 +113,4 @@ export async function warningsFor(place,signal){
  }
  return {status:'unsupported',checked:Date.now(),items:[],source:officialSource(place).name,scope:place.name};
 }
+
